@@ -12,7 +12,7 @@ class Id3TreeBuilder:
 
     def __init__(self, data_set, test_type):
         self._test_type = test_type
-        self._root = self._create_subtree(data_set, list(range(1, len(data_set)-1)))
+        self._root = self._create_subtree(data_set, list(range(1, len(data_set[0])-1)))
 
     def get_tree(self):
         return self._root
@@ -38,7 +38,7 @@ class Id3TreeBuilder:
         best_attribute_information_gain = 0
         for attribute_number in avaliable_attributes:
             attribute_information_gain = self._calculate_information_gain(data_list, attribute_number)
-            if attribute_information_gain > best_attribute_information_gain:
+            if attribute_information_gain >= best_attribute_information_gain:
                 best_attribute_information_gain = attribute_information_gain
                 best_attribute_number = attribute_number
         return best_attribute_number
@@ -62,13 +62,13 @@ class Id3TreeBuilder:
     def _calculate_information_gain(self, data_list, attribute_number):
         set_entrophy = self._calculate_entrophy(data_list)
         subsets_mean_entrophy = self._calculate_subsets_mean_entrophy(data_list, attribute_number)
-        return set_entrophy - subsets_mean_entrophy
+        return round(set_entrophy - subsets_mean_entrophy, 6)  # Round to ignore floating-point calculation errors
 
     def _calculate_entrophy(self, data_list):
         classes_frequencies = self._calculate_class_frequencies(data_list)
         entrophy = 0
         for class_value, class_frequency in classes_frequencies:
-            entrophy += class_frequency * math.log(class_frequency, 2)
+            entrophy += class_frequency * math.log2(class_frequency)
         return -entrophy
 
     def _calculate_subsets_mean_entrophy(self, data_list, division_attribute_number):
