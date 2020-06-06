@@ -1,10 +1,17 @@
 import math
+import enum
+import random
 from attribute_node import AttributeNode
 from leaf_node import LeafNode
 
-class Id3TreeBuilder:
 
-    def __init__(self, data_set):
+class Id3TreeBuilder:
+    class TestType(enum.Enum):
+        CLASSIC = 0
+        TOURNAMENT = 1
+
+    def __init__(self, data_set, test_type):
+        self._test_type = test_type
         self._root = self._create_subtree(data_set, list(range(1, len(data_set)-1)))
 
     def get_tree(self):
@@ -26,7 +33,7 @@ class Id3TreeBuilder:
             attribute_value_with_node_pairs.append((attribute_value, node))
         return AttributeNode(attribute_number, attribute_value_with_node_pairs)
 
-    def _get_attribute_to_split_on(self, data_list, avaliable_attributes):
+    def _get_attribute_to_split_on_classic(self, data_list, avaliable_attributes):
         best_attribute_number = None
         best_attribute_information_gain = 0
         for attribute_number in avaliable_attributes:
@@ -35,6 +42,22 @@ class Id3TreeBuilder:
                 best_attribute_information_gain = attribute_information_gain
                 best_attribute_number = attribute_number
         return best_attribute_number
+
+    def _get_attribute_to_split_on_tournament(self, data_list, avaliable_attributes):
+        if len(avaliable_attributes) > 1:
+            attributes = random.sample(avaliable_attributes, 2)
+            return self._get_attribute_to_split_on_classic(data_list, attributes)
+        else:
+            return avaliable_attributes[0]
+
+    def _get_attribute_to_split_on(self, data_list, avaliable_attributes):
+        if self._test_type == self.TestType.CLASSIC:
+            return self._get_attribute_to_split_on_classic(data_list, avaliable_attributes)
+        elif self._test_type == self.TestType.TOURNAMENT:
+            return self._get_attribute_to_split_on_tournament(data_list, avaliable_attributes)
+        else:
+            raise RuntimeError("Bad test type")
+
 
     def _calculate_information_gain(self, data_list, attribute_number):
         set_entrophy = self._calculate_entrophy(data_list)
