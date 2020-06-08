@@ -12,7 +12,7 @@ class Id3TreeBuilder:
 
     def __init__(self, data_set, test_type):
         self._test_type = test_type
-        self._root = self._create_subtree(data_set, list(range(1, len(data_set[0])-1)))
+        self._root = self._create_subtree(data_set, list(range(1, len(next(iter(data_set)))-1)))
 
     def get_tree(self):
         return self._root
